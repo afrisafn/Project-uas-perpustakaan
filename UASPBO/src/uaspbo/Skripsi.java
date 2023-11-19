@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 import javax.swing.JOptionPane;
@@ -101,6 +102,9 @@ public class Skripsi extends javax.swing.JFrame {
         jButton5 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable2 = new javax.swing.JTable();
+        jTextField6 = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
+        jComboBox1 = new javax.swing.JComboBox<>();
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -241,6 +245,22 @@ public class Skripsi extends javax.swing.JFrame {
 
         getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 630, 1410, 280));
 
+        jTextField6.setBackground(new java.awt.Color(204, 204, 204));
+        jTextField6.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTextField6KeyReleased(evt);
+            }
+        });
+        getContentPane().add(jTextField6, new org.netbeans.lib.awtextra.AbsoluteConstraints(1160, 180, 240, -1));
+
+        jLabel7.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
+        jLabel7.setForeground(new java.awt.Color(204, 204, 204));
+        jLabel7.setText("Search");
+        getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(1110, 180, 50, 20));
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Judul skripsi", "Penulis skripsi", "Halaman skripsi", " " }));
+        getContentPane().add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1160, 210, 240, 30));
+
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/gambar/skripsi.png"))); // NOI18N
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1420, 910));
 
@@ -365,8 +385,8 @@ public class Skripsi extends javax.swing.JFrame {
     private void jTable2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable2MouseClicked
         // TODO add your handling code here:
         int baris = jTable2.rowAtPoint(evt.getPoint());
-        String Idskripsi = jTable2.getValueAt(baris, 0).toString();
-        jTextField1.setText(Idskripsi);
+        String IDskripsi = jTable2.getValueAt(baris, 0).toString();
+        jTextField1.setText(IDskripsi);
 
         String Judulskripsi= jTable2.getValueAt(baris, 1).toString();
         jTextField2.setText(Judulskripsi);
@@ -382,6 +402,77 @@ public class Skripsi extends javax.swing.JFrame {
         
 
     }//GEN-LAST:event_jTable2MouseClicked
+
+    private void jTextField6KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField6KeyReleased
+        // TODO add your handling code here:
+             try {
+            String selection = (String) jComboBox1.getSelectedItem();
+            String searchTerm = jTextField6.getText().trim();
+
+            // Building the JPA query dynamically based on the selected criteria
+            String queryString = "SELECT b FROM Skripsi_1 s  WHERE ";
+            System.out.println(selection.toLowerCase());
+            switch (selection.toLowerCase()) {
+               
+                case "judul skripsi":
+                    queryString += "LOWER(b.judulSkripsi) LIKE LOWER(:searchTerm)";
+                    break;
+                case "penulis skripsi":
+                    queryString += "LOWER(b.penulisSkripsi) LIKE LOWER(:searchTerm)";
+                    break;
+              
+                default:
+                    throw new IllegalArgumentException("No search criteria selected.");
+            }
+
+            // Create and execute the JPA query
+            EntityManagerFactory emf = Persistence.createEntityManagerFactory("UASPBOPU");
+            EntityManager em = emf.createEntityManager();
+
+            // Check if WHERE clause is not empty
+            if (queryString.endsWith(" WHERE ")) {
+                throw new IllegalArgumentException("No search criteria selected.");
+            }
+
+            TypedQuery<Skripsi_1> query = em.createQuery(queryString, Skripsi_1.class);
+            query.setParameter("searchTerm", "%" + searchTerm + "%");
+
+            List<Skripsi_1> results = query.getResultList();
+
+            DefaultTableModel dataModel = new DefaultTableModel();
+
+            // Add columns to the model
+            dataModel.addColumn("ID skripsi");
+            dataModel.addColumn("Judul skripsi");
+            dataModel.addColumn("Penulis skripsi");
+            dataModel.addColumn("Halaman skripsi");
+            dataModel.addColumn("Tahun skripsi");
+         
+            // ... add other columns as needed
+
+            // Add rows to the model
+            for (Skripsi_1 result : results) {
+                Object[] rowData = {
+                    result.getIdSkripsi(),
+                    result.getJudulSkripsi(),
+                    result.getPenulisSkripsi(),
+                    result.getHalamanSkripsi(),
+                    result.getTahunSkripsi(),
+                   
+                };
+                dataModel.addRow(rowData);
+            }
+
+            // Set jTable1 with the created model
+            jTable2.setModel(dataModel);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            
+        }
+
+        
+        
+    }//GEN-LAST:event_jTextField6KeyReleased
 
     /**
      * @param args the command line arguments
@@ -424,12 +515,14 @@ public class Skripsi extends javax.swing.JFrame {
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
+    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable2;
     private javax.swing.JTextField jTextField1;
@@ -437,6 +530,7 @@ public class Skripsi extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField3;
     private javax.swing.JTextField jTextField4;
     private javax.swing.JTextField jTextField5;
+    private javax.swing.JTextField jTextField6;
     // End of variables declaration//GEN-END:variables
 }
 

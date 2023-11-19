@@ -6,15 +6,26 @@
 package uaspbo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.swing.JOptionPane;
+import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -23,6 +34,8 @@ import javax.swing.table.DefaultTableModel;
 public class Buku extends javax.swing.JFrame {
         ArrayList<Buku_1> dataBuku;
         private int id = 0;
+        
+        
     /**
      * Creates new form Buku
      */
@@ -74,34 +87,7 @@ public class Buku extends javax.swing.JFrame {
         entityManager.close();
     }
     
-    void cariisbn(String id) {
-        DefaultTableModel tb1 = (DefaultTableModel) jTable1.getModel();
-        tb1.setRowCount(0);
-        EntityManager em = Persistence.createEntityManagerFactory("UASPBOPU").createEntityManager();
-        em.getTransaction().begin();
-        Query query = em.createQuery("SELECT b FROM Buku_1 b WHERE LOWER(b.isbn) LIKE :idBuku ORDER BY b.isbn");
-        query.setParameter("isbn", "%" + id.toLowerCase() + "%");
-        List<Buku_1> list = query.getResultList();
-        em.getTransaction().commit();
-        em.close();
-        for (int i = 0; i < list.size(); i++) {
-            Buku_1 b = list.get(i);
-            b.setKategori(ambilKategori(b.getIdBuku()));
-            b.setPengarang(ambilPengarang(b.getIdBuku()));
-            list.set(i, b);
-            String peng = "";
-            for (String p : b.getPengarang()) {
-                if (peng.equals("")) {
-                    peng = p;
-                } else {
-                    peng = peng + ", " + p;
-                }
-            }
-            jTable1.addRow(new Object[]{
-                b.getIsbn(), b.getJudulBuku(), b.getPengarang(), b.getPenerbit(), peng
-            });
-        }
-    }
+   
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -132,10 +118,9 @@ public class Buku extends javax.swing.JFrame {
         jButton5 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-        jTextField1 = new javax.swing.JTextField();
+        search = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
-        jButton6 = new javax.swing.JButton();
+        kategori = new javax.swing.JComboBox<>();
         jLabel9 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -229,6 +214,11 @@ public class Buku extends javax.swing.JFrame {
         jButton1.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
         jButton1.setText("Cetak");
         jButton1.setBorder(null);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
         getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 580, 140, 40));
 
         jButton2.setBackground(new java.awt.Color(204, 204, 0));
@@ -291,51 +281,42 @@ public class Buku extends javax.swing.JFrame {
 
         getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 630, 1400, 280));
 
-        jTextField1.setBackground(new java.awt.Color(204, 204, 204));
-        jTextField1.addFocusListener(new java.awt.event.FocusAdapter() {
+        search.setBackground(new java.awt.Color(204, 204, 204));
+        search.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
-                jTextField1FocusGained(evt);
+                searchFocusGained(evt);
             }
             public void focusLost(java.awt.event.FocusEvent evt) {
-                jTextField1FocusLost(evt);
+                searchFocusLost(evt);
             }
         });
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+        search.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
+                searchActionPerformed(evt);
             }
         });
-        jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
+        search.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
-                jTextField1KeyReleased(evt);
+                searchKeyReleased(evt);
             }
             public void keyTyped(java.awt.event.KeyEvent evt) {
-                jTextField1KeyTyped(evt);
+                searchKeyTyped(evt);
             }
         });
-        getContentPane().add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1090, 180, 270, 30));
+        getContentPane().add(search, new org.netbeans.lib.awtextra.AbsoluteConstraints(1090, 180, 280, 30));
 
         jLabel10.setFont(new java.awt.Font("Century Schoolbook", 0, 24)); // NOI18N
         jLabel10.setForeground(new java.awt.Color(255, 255, 255));
         jLabel10.setText("Penerbit");
         getContentPane().add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 320, 150, 40));
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+        kategori.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Judul buku", "Pengarang", "tahun terbit", " " }));
+        kategori.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
+                kategoriActionPerformed(evt);
             }
         });
-        getContentPane().add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1090, 220, 280, 30));
-
-        jButton6.setBackground(new java.awt.Color(204, 204, 204));
-        jButton6.setForeground(new java.awt.Color(204, 204, 204));
-        jButton6.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton6ActionPerformed(evt);
-            }
-        });
-        getContentPane().add(jButton6, new org.netbeans.lib.awtextra.AbsoluteConstraints(1360, 180, 30, 30));
+        getContentPane().add(kategori, new org.netbeans.lib.awtextra.AbsoluteConstraints(1090, 220, 280, 30));
 
         jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/gambar/Buku.png"))); // NOI18N
         getContentPane().add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1400, -1));
@@ -413,7 +394,7 @@ public class Buku extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-         // TODO add your handling code here:
+          // TODO add your handling code here:
         int isbn = Integer.parseInt(jTextField2.getText().trim());
         String judulBuku = jTextField3.getText();
         String subJudul = jTextField4.getText().trim();
@@ -502,60 +483,175 @@ public class Buku extends javax.swing.JFrame {
 
     }//GEN-LAST:event_jTable1MouseClicked
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+    private void searchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
+    }//GEN-LAST:event_searchActionPerformed
 
-    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+    private void searchKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_searchKeyReleased
         // TODO add your handling code here:
-         String sc = jTextField1.getText();
-        switch (jComboBox1.getSelectedIndex()) {
-            case 0:
-                cariJudulbuku(sc);
-                break;
-            case 1:
-                cariPengarang(sc);
-                break;
-            case 2:
-                cariPenerbit(sc);
-                break;
-            case 3:
-                cariisbn(sc);
-                break;
+        try {
+            String selection = (String) kategori.getSelectedItem();
+            String searchTerm = search.getText().trim();
+
+            // Building the JPA query dynamically based on the selected criteria
+            String queryString = "SELECT b FROM Buku_1 b  WHERE ";
+            System.out.println(selection.toLowerCase());
+            switch (selection.toLowerCase()) {
+               
+                case "judul buku":
+                    queryString += "LOWER(b.judulBuku) LIKE LOWER(:searchTerm)";
+                    break;
+                case "pengarang":
+                    queryString += "LOWER(b.pengarang) LIKE LOWER(:searchTerm)";
+                    break;
+                    
+               case "tahun terbit":
+                    queryString += "b.tahunTerbit = :searchTerm";
+                    break;
+              
+                default:
+                    throw new IllegalArgumentException("No search criteria selected.");
+            }
+
+            // Create and execute the JPA query
+            EntityManagerFactory emf = Persistence.createEntityManagerFactory("UASPBOPU");
+            EntityManager em = emf.createEntityManager();
+
+            // Check if WHERE clause is not empty
+            if (queryString.endsWith(" WHERE ")) {
+                throw new IllegalArgumentException("No search criteria selected.");
+            }
+            
+            
+
+            TypedQuery<Buku_1> query = em.createQuery(queryString, Buku_1.class);
+            
+            if (selection.toLowerCase().equals("tahun terbit")) {
+                 query.setParameter("searchTerm", Integer.parseInt(searchTerm));
+            } else{
+               query.setParameter("searchTerm" ,"%"+searchTerm+"%");
+            } 
+            
+
+            List<Buku_1> results = query.getResultList();
+
+            DefaultTableModel dataModel = new DefaultTableModel();
+
+            // Add columns to the model
+            dataModel.addColumn("isbn");
+            dataModel.addColumn("Judulbuku");
+            dataModel.addColumn("Subjudul");
+            dataModel.addColumn("Pengarang");
+            dataModel.addColumn("Penerbit");
+            dataModel.addColumn("Tahun terbit");
+            dataModel.addColumn("Halaman buku");
+           
+            // ... add other columns as needed
+
+            // Add rows to the model
+            for (Buku_1 result : results) {
+                Object[] rowData = {
+                    result.getIsbn(),
+                    result.getJudulBuku(),
+                    result.getSubJudul(),
+                    result.getPengarang(),
+                    result.getPenerbit(),
+                    result.getTahunTerbit(),
+                    result.getHalamanBuku()
+
+                };
+                dataModel.addRow(rowData);
+            }
+
+            // Set jTable1 with the created model
+            jTable1.setModel(dataModel);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            
         }
-    }//GEN-LAST:event_jButton6ActionPerformed
+        
+        
+    }//GEN-LAST:event_searchKeyReleased
 
-    private void jTextField1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyReleased
+    private void searchFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_searchFocusGained
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1KeyReleased
+       
+    }//GEN-LAST:event_searchFocusGained
 
-    private void jTextField1FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextField1FocusGained
+    private void searchFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_searchFocusLost
         // TODO add your handling code here:
-         String s = jTextField1.getText();
-        if (s.equals("Cari")) {
-            jTextField1.setText("");
+       
+    }//GEN-LAST:event_searchFocusLost
+
+    private void searchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_searchKeyTyped
+        // TODO add your handling code here:
+        
+    }//GEN-LAST:event_searchKeyTyped
+
+    private void kategoriActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kategoriActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_kategoriActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+         try {
+            String selection = (String) kategori.getSelectedItem();
+            String searchTerm = search.getText().trim();
+
+            // Building the JPA query dynamically based on the selected criteria
+            String queryString = "SELECT b FROM Buku_1 b  WHERE ";
+            System.out.println(selection.toLowerCase());
+            switch (selection.toLowerCase()) {
+               
+                case "judul buku":
+                    queryString += "LOWER(b.judulBuku) LIKE LOWER(:searchTerm)";
+                    break;
+                case "pengarang":
+                    queryString += "LOWER(b.pengarang) LIKE LOWER(:searchTerm)";
+                    break;
+                    
+               case "tahun terbit":
+                    queryString += "b.tahunTerbit = :searchTerm";
+                    break;
+              
+                default:
+                    throw new IllegalArgumentException("No search criteria selected.");
+            }
+
+            // Create and execute the JPA query
+            EntityManagerFactory emf = Persistence.createEntityManagerFactory("UASPBOPU");
+            EntityManager em = emf.createEntityManager();
+
+            // Check if WHERE clause is not empty
+            if (queryString.endsWith(" WHERE ")) {
+                throw new IllegalArgumentException("No search criteria selected.");
+            }
+            
+            TypedQuery<Buku_1> query = em.createQuery(queryString, Buku_1.class);
+            
+            if (selection.toLowerCase().equals("tahun terbit")) {
+                 query.setParameter("searchTerm", Integer.parseInt(searchTerm));
+            } else{
+               query.setParameter("searchTerm" ,"%"+searchTerm+"%");
+            } 
+            
+          List<Buku_1> results = query.getResultList();
+             Map<String,Object> parameter = new HashMap<>();
+           parameter.put("querySearch", searchTerm);
+           parameter.put("searchBy", selection);
+          
+            String jrxmlFile = new String("src/uaspbo/Laporan.jrxml");
+            JasperReport jr = JasperCompileManager.compileReport(jrxmlFile);
+            JasperPrint jp = JasperFillManager.fillReport(jr, null, new JRBeanCollectionDataSource(results));
+            JasperViewer.viewReport(jp, false);
+        } catch (JRException ex) {
+            Logger.getLogger(Buku.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception e) {
+            Logger.getLogger(Buku.class.getName()).log(Level.SEVERE, null, e);
         }
-    }//GEN-LAST:event_jTextField1FocusGained
-
-    private void jTextField1FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextField1FocusLost
-        // TODO add your handling code here:
-        String s = jTextField1.getText();
-        if (s.equals("")) {
-            jTextField1.setText("Cari");
-        }
-    }//GEN-LAST:event_jTextField1FocusLost
-
-    private void jTextField1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyTyped
-        // TODO add your handling code here:
-        char c = evt.getKeyChar();
-        if (c == '\n') {
-            jButton6ActionPerformed(null);
-        }
-    }//GEN-LAST:event_jTextField1KeyTyped
-
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox1ActionPerformed
+        
+        
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -598,8 +694,6 @@ public class Buku extends javax.swing.JFrame {
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -611,7 +705,6 @@ public class Buku extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField3;
     private javax.swing.JTextField jTextField4;
@@ -619,5 +712,10 @@ public class Buku extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField6;
     private javax.swing.JTextField jTextField7;
     private javax.swing.JTextField jTextField8;
+    private javax.swing.JComboBox<String> kategori;
+    private javax.swing.JTextField search;
     // End of variables declaration//GEN-END:variables
-}
+  }
+
+
+

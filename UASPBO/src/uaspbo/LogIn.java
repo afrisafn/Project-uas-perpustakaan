@@ -119,7 +119,7 @@ public class LogIn extends javax.swing.JFrame {
                  this.peringatan("Input Data Gagal");
             }
             
-            new LogIn().setVisible(true);
+            new Beranda().setVisible(true);
                 this.dispose();
                 
            LogIn Beranda;
@@ -132,15 +132,6 @@ public class LogIn extends javax.swing.JFrame {
      
 
        
-
-    @Override
-    public void dispose() {
-        super.dispose(); //To change body of generated methods, choose Tools | Templates.
-        new LogIn().setVisible(true);
-            this.dispose();
-        
-        Beranda Beranda;
-    }
 
         
     /**

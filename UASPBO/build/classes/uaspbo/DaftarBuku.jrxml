@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="null" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="720eb7e6-82ab-403b-acca-048fd9a33848">
+	<property name="ireport.zoom" value="1.7715610000000013"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString language="SQL">
+		<![CDATA[select*from buku;]]>
+	</queryString>
+	<field name="isbn" class="java.lang.Integer"/>
+	<field name="judulBuku" class="java.lang.String"/>
+	<field name="halaman_buku" class="java.lang.String"/>
+	<field name="sub_judul" class="java.lang.String"/>
+	<field name="penerbit" class="java.lang.String"/>
+	<field name="tahun_terbit" class="java.lang.Integer"/>
+	<field name="pengarang" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<staticText>
+				<reportElement x="171" y="26" width="221" height="53" uuid="187fef21-b7be-43ff-8eb2-32ebbd34ec1b"/>
+				<textElement>
+					<font size="28" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Laporan Buku]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="34" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="49" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="49" height="23" uuid="def21a46-10ae-4c5e-b189-c9541c067c61"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[isbn ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="130" y="0" width="90" height="23" uuid="79730d96-55e3-48e3-b8f7-da9828bffe4a"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Sub judul ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="49" y="0" width="81" height="23" uuid="ec858916-d570-4a77-abf8-7c6ff7f6f7ff"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Judul buku]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="220" y="0" width="84" height="23" uuid="69f0834c-cbd7-4a94-95a4-81c4904d85e2"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Pengarang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="304" y="0" width="82" height="23" uuid="25de5431-abf8-40ab-95a7-d779888e3eaa"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Penerbit]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="386" y="0" width="89" height="23" uuid="b09a6197-c912-4933-8e36-37dc2e907f4c"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Tahun terbit ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="475" y="0" width="80" height="23" uuid="4bc15973-ed59-4773-92e1-2caa0b73de45"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Halaman buku ]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="69" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="49" height="21" uuid="ea14340c-9a3b-43f8-a10f-bfa158e324f7"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{isbn}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="49" y="0" width="81" height="21" uuid="fc37e552-bcc0-488f-b0e8-9fe394dcd3fa"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{judulBuku }]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="130" y="0" width="90" height="21" uuid="98e086d5-3f55-4229-9990-184e9bd8b4df"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{sub_judul}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="220" y="0" width="84" height="21" uuid="1f41c71e-b39e-4563-a9d3-f5612f559b14"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{pengarang}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="304" y="0" width="82" height="21" uuid="63859452-a2aa-42ef-adb0-0e677e84d905"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{penerbit}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="386" y="0" width="89" height="21" uuid="79589ab5-79df-43a7-9f92-9dd5a5a904aa"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tahun_terbit}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="475" y="0" width="80" height="31" uuid="46d2df39-b86d-4a06-8cf7-d2200fd03da6"/>
+				<textElement>
+					<font fontName="Arial Narrow"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{halaman_buku}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>
